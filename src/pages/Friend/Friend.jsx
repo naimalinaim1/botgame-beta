@@ -122,7 +122,7 @@ const Friend = () => {
                     src={noFriendImg}
                     alt=""
                   />
-                  <p className="text-[#FFFFFF99] my-2">Not friends yet</p>
+                  <p className="text-[#FFFFFF99] my-2 text-center">Not friends yet</p>
                 </div>
               )}
             </div>

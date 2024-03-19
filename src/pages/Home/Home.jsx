@@ -4,6 +4,7 @@ import Coins from "./section/Coins";
 import ClimeDate from "./section/ClimeDate";
 import ProcessBar from "./section/ProcessBar";
 import SocialMedia from "./section/SocialMedia";
+import { loadUserData, updateUserCoin } from "../../utility/utility";
 
 const Home = () => {
   const [coins, setCoins] = useState(0);
@@ -20,105 +21,58 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const tapCoin = () => {
+  const animationImg = () => {
     const container = document.getElementById("coin-animation-container");
     container.style.zIndex = "-5555";
-
-    // Create an image element
+    // create image
     const image = document.createElement("img");
-    image.className = "-z-[5] animation-img-cls w-14 h-14 absolute"; // Assuming this is Tailwind CSS class
-    image.src = btnCoins; // Update src with the correct path
+    image.className = "-z-[5] animation-img-cls w-14 h-14 absolute";
+    image.src = btnCoins;
     image.alt = "Yes Button";
 
-    // Generate random top and left positions
-    const randomTop = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
-    const randomLeft = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+    const randomNum = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+    image.style.top = randomNum + "%";
+    image.style.left = randomNum + "%";
 
-    // Apply random positions
-    image.style.top = randomTop + "%";
-    image.style.left = randomLeft + "%";
-
-    // Append the image to the container
     container.appendChild(image);
-
-    // Remove the image after 2000 milliseconds (2 seconds)
     setTimeout(() => {
       image.remove();
     }, 2000);
+  };
+
+  const tapCoin = () => {
+    // image animation
+    animationImg();
 
     setCoins(coins + 1);
     setCountClick(countClick + 1);
-
     if ((countClick + 1) % 3 === 0) {
       setEnergy((prevEnergy) => Math.max(prevEnergy - 1, 0));
     }
 
     // boost
-    if (isBoost) {
-      setIsBoost(false);
-    } else {
-      setTimeout(() => {
-        setIsBoost(true);
-      }, 3000);
-    }
+    isBoost ? setIsBoost(false) : setTimeout(() => setIsBoost(true), 3000);
 
-    // update user information
-    const isExitUserId = localStorage.getItem("userId");
-    if (isExitUserId) {
-      const newPoint = coins + 1;
-      try {
-        fetch(
-          `https://botgame-server-bt1012.vercel.app/users/${isExitUserId}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({ points: newPoint }),
-            headers: {
-              "Content-type": "application/json",
-            },
-          }
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            if (!data.acknowledged) {
-              console.error("Error? Please reload page? try again");
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  };
-
-  const setUserInfo = () => {
-    const isExistUser = localStorage.getItem("userId");
-    fetch(`https://botgame-server-bt1012.vercel.app/users/${isExistUser}`)
-      .then((data) => data.json())
-      .then((data) => {
-        let { points } = data;
-        setCoins(points);
-      });
+    // update user information: coins
+    updateUserCoin();
   };
 
   useEffect(() => {
     if (isBoost) {
-      const interval = setInterval(() => {
-        if (energy === 1000) {
-          clearInterval(interval);
-        } else {
-          setEnergy((prevEnergy) => prevEnergy + 1);
-        }
-      }, 500);
-
+      const interval = setInterval(
+        () => energy < 1000 && setEnergy((prevEnergy) => prevEnergy + 1),
+        500
+      );
       return () => clearInterval(interval);
     }
   }, [energy, isBoost]);
 
   // load users data
   useEffect(() => {
-    const isExistUser = localStorage.getItem("userId");
-    if (isExistUser) {
-      setUserInfo();
-    }
+    (async () => {
+      const userData = await loadUserData();
+      setCoins(userData.points);
+    })();
   }, []);
 
   return (

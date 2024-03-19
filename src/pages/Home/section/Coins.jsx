@@ -1,6 +1,9 @@
 import PropTypes from "prop-types";
 import coins from "../../../assets/coins/coins.png";
 const Coins = ({ points }) => {
+  if (!points && points != 0) {
+    window.location.reload();
+  }
   return (
     <div className="flex justify-center items-center h-[52px]">
       <img className="w-10 h-10" src={coins} alt="coins" />

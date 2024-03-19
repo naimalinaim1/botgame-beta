@@ -23,134 +23,130 @@
 
     <div id="root"></div>
 
+    <!-- utility code -->
     <script>
-      const loader = document.getElementById("loader");
+      // user id
+      const setUserId = (id) => localStorage.setItem("userId", id);
+      const getUserId = () => localStorage.getItem("userId");
 
-      const initializeApp = async () => {
-        const getUserId = localStorage.getItem("userId");
-        const data = {
-          points: 0,
-          totalRefer: 0,
-          friendList: [],
-        };
+      // refer id
+      const getReferId = (url) => url.split("=")[1].split("&")[0];
 
-        const referUrl = window.location.search;
-        // refer user create
+      // create a user
+      const createUser = async (data) => {
+        try {
+          const res = await fetch(
+            "https://botgame-server-bt1012.vercel.app/users",
+            {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: {
+                "Content-type": "application/json",
+              },
+            }
+          );
+
+          const resData = await res.json();
+          const id = resData?.userId;
+          id && setUserId(id);
+        } catch (e) {
+          console.log("createUser error:", e);
+        }
+      };
+
+      // load user data
+      const loadUserData = async (userId) => {
+        try {
+          const res = await fetch(
+            `https://botgame-server-bt1012.vercel.app/users/${userId}`
+          );
+          const resData = await res.json();
+          return resData;
+        } catch (e) {
+          console.log("loadUserByReferId error: ", e);
+        }
+      };
+
+      // update user
+      const updateUser = async (id, data) => {
+        try {
+          const res = await fetch(
+            `https://botgame-server-bt1012.vercel.app/users/${id}`,
+            {
+              method: "PATCH",
+              body: JSON.stringify(data),
+              headers: {
+                "Content-type": "application/json",
+              },
+            }
+          );
+          const resData = await res.json();
+        } catch (e) {
+          console.log("updateUser error: ", e);
+        }
+      };
+
+      // default user data
+      const referUrl = window.location.search;
+      const data = {
+        points: 0,
+        totalRefer: 0,
+        friendList: [],
+      };
+
+      if (!getUserId()) {
+        // create user by refer code
         if (referUrl) {
           try {
-            const referId = referUrl.split("=")[1].split("&")[0];
-            if (referId) {
-              // update data points
-              data.points = 50000;
-              data.friendList.push(referId);
-            }
+            const referId = getReferId(referUrl);
+            referId && ((data.points = 50000), data.friendList.push(referId));
 
-            // refer code user create
-            if (!getUserId) {
-              try {
-                const response = await fetch(
-                  "https://botgame-server-bt1012.vercel.app/users",
-                  {
-                    method: "POST",
-                    body: JSON.stringify(data),
-                    headers: {
-                      "Content-type": "application/json",
-                    },
-                  }
-                );
-
-                const responseData = await response.json();
-                if (responseData?.userId) {
-                  const userId = responseData.userId;
-                  localStorage.setItem("userId", userId);
-                }
-              } catch (e) {
-                console.log(e);
-              }
-            }
+            // user create function
+            !getUserId() && createUser(data);
 
             // update refer information
-            if (getUserId !== referId) {
+            if (getUserId() !== referId) {
               // load refer user information
-              const response = await fetch(
-                `https://botgame-server-bt1012.vercel.app/users/${referId}`
-              );
-              const responseData = await response.json();
-
-              // update refer information
-              const points = responseData.points + 50000;
-              const totalRefer = responseData.totalRefer + 1;
-              const prevFriend = responseData.friendList;
-              const newFriendId = localStorage.getItem("userId");
-              const newFriendList = [...prevFriend, newFriendId];
-              const referUserData = {
-                points,
-                totalRefer,
-                friendList: newFriendList,
-              };
-
-              // save refer information
-              const resUser = await fetch(
-                `https://botgame-server-bt1012.vercel.app/users/${referId}`,
-                {
-                  method: "PATCH",
-                  body: JSON.stringify(referUserData),
-                  headers: {
-                    "Content-type": "application/json",
-                  },
-                }
-              );
-              const resUserData = await resUser.json();
+              (async () => {
+                const referData = await loadUserData(referId);
+                // update refer information
+                const points = referData.points + 50000;
+                const totalRefer = referData.totalRefer + 1;
+                const prevFriend = referData.friendList;
+                const newFriendId = getUserId();
+                const newFriendList = [...prevFriend, newFriendId];
+                const referUserData = {
+                  points,
+                  totalRefer,
+                  friendList: newFriendList,
+                };
+                // update refer information
+                updateUser(referId, referUserData);
+              })();
             }
           } catch (err) {
             console.log(err);
           }
-        } else {
-          // no refer code user create
-          if (!getUserId) {
-            try {
-              const response = await fetch(
-                "https://botgame-server-bt1012.vercel.app/users",
-                {
-                  method: "POST",
-                  body: JSON.stringify(data),
-                  headers: {
-                    "Content-type": "application/json",
-                  },
-                }
-              );
-
-              const responseData = await response.json();
-              if (responseData?.userId) {
-                const userId = responseData.userId;
-                localStorage.setItem("userId", userId);
-              }
-            } catch (e) {
-              console.log(e);
-            }
-          }
+        }
+        // create user by default
+        else {
+          !getUserId() && createUser(data);
         }
 
-        // load window
-        if (referUrl) {
-          window.location.href = window.location.origin;
-        }
-      };
-
-      initializeApp();
+        // reload page
+        // referUrl && (window.location.href = window.location.origin);
+      }
     </script>
 
     <script type="module" src="/src/main.jsx"></script>
     <script>
+      const loader = document.getElementById("loader");
       let hasLoaded = false;
-
-      // Delay displaying rootEle by 0.6 seconds, but only execute once
-      if (!hasLoaded) {
-        setTimeout(function () {
+      !hasLoaded &&
+        setTimeout(() => {
           loader.style.display = "none";
           hasLoaded = true;
         }, 3000);
-      }
     </script>
   </body>
 </html>
