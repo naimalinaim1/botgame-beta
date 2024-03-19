@@ -21,6 +21,31 @@ const Home = () => {
   }, []);
 
   const tapCoin = () => {
+    const container = document.getElementById("coin-animation-container");
+    container.style.zIndex = "-5555";
+
+    // Create an image element
+    const image = document.createElement("img");
+    image.className = "-z-[5] animation-img-cls w-14 h-14 absolute"; // Assuming this is Tailwind CSS class
+    image.src = btnCoins; // Update src with the correct path
+    image.alt = "Yes Button";
+
+    // Generate random top and left positions
+    const randomTop = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+    const randomLeft = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+
+    // Apply random positions
+    image.style.top = randomTop + "%";
+    image.style.left = randomLeft + "%";
+
+    // Append the image to the container
+    container.appendChild(image);
+
+    // Remove the image after 2000 milliseconds (2 seconds)
+    setTimeout(() => {
+      image.remove();
+    }, 2000);
+
     setCoins(coins + 1);
     setCountClick(countClick + 1);
 
@@ -103,16 +128,23 @@ const Home = () => {
           <Coins points={coins} />
           <ClimeDate />
           <div className="w-full absolute top-[60%]  sm:top-[63%] transform -translate-y-1/2 flex justify-center">
+            <div className="w-full absolute top-[60%]  sm:top-[63%] transform -translate-y-1/2 flex justify-center">
+              {/* coin animation container */}
+              <div
+                id="coin-animation-container"
+                className="w-[300px] h-[300px]"
+              ></div>
+            </div>
             {isVisible ? (
               <img
                 onClick={tapCoin}
-                className="w-[140px] h-[140px] xs:w-[170px] xs:h-[170px] sm:w-[242px] sm:h-[251px]"
+                className="z-[10] w-[140px] h-[140px] xs:w-[170px] xs:h-[170px] sm:w-[242px] sm:h-[251px]"
                 src={btnCoins}
                 alt="Yes Button"
               />
             ) : (
               <img
-                className="w-[140px] h-[140px] xs:w-[170px] xs:h-[170px] sm:w-[242px] sm:h-[251px]"
+                className="z-[10] w-[140px] h-[140px] xs:w-[170px] xs:h-[170px] sm:w-[242px] sm:h-[251px]"
                 src={btnCoins}
                 alt="Yes Button"
               />

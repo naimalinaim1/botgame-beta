@@ -73,3 +73,27 @@ html {
   background-color: #888; /* Color of scrollbar thumb */
   border-radius: 15px; /* Border radius */
 }
+
+/* coin animation */
+.animation-img-cls {
+  animation: animation-img-top 2s ease-out;
+}
+
+@keyframes animation-img-top {
+  0% {
+    display: inline;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  75% {
+    opacity: 0.3;
+  }
+  100% {
+    top: -450px;
+    opacity: 0;
+  }
+}
