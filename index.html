@@ -36,7 +36,7 @@
       const createUser = async (data) => {
         try {
           const res = await fetch(
-            "https://botgame-server-bt1012.vercel.app/users",
+            "https://yescoin-server-btys2.vercel.app/users",
             {
               method: "POST",
               body: JSON.stringify(data),
@@ -58,7 +58,7 @@
       const loadUserData = async (userId) => {
         try {
           const res = await fetch(
-            `https://botgame-server-bt1012.vercel.app/users/${userId}`
+            `https://yescoin-server-btys2.vercel.app/users/${userId}`
           );
           const resData = await res.json();
           return resData;
@@ -71,7 +71,7 @@
       const updateUser = async (id, data) => {
         try {
           const res = await fetch(
-            `https://botgame-server-bt1012.vercel.app/users/${id}`,
+            `https://yescoin-server-btys2.vercel.app/users/${id}`,
             {
               method: "PATCH",
               body: JSON.stringify(data),

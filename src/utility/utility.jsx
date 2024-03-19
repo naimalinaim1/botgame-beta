@@ -5,7 +5,7 @@ const loadUserData = async () => {
   const userId = getUserId();
   try {
     const res = await fetch(
-      `https://botgame-server-bt1012.vercel.app/users/${userId}`
+      `https://yescoin-server-btys2.vercel.app/users/${userId}`
     );
     const resData = await res.json();
     return resData;
@@ -22,7 +22,7 @@ const updateUserCoin = async () => {
     const newPoints = userData?.points + 1;
     try {
       const res = await fetch(
-        `https://botgame-server-bt1012.vercel.app/users/${id}`,
+        `https://yescoin-server-btys2.vercel.app/users/${id}`,
         {
           method: "PATCH",
           body: JSON.stringify({ points: newPoints }),

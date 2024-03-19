@@ -37,7 +37,7 @@ const Friend = () => {
     const userId = localStorage.getItem("userId");
     const loadFriendList = async () => {
       const res = await fetch(
-        `https://botgame-server-bt1012.vercel.app/friends/${userId}`
+        `https://yescoin-server-btys2.vercel.app/friends/${userId}`
       );
       const data = await res.json();
       const friends = data[0]?.friends;
